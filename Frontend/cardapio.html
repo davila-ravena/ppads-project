@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Cardápio do Restaurante</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: row;
+        }
+
+        main {
+            flex: 3;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            text-align: center;
+        }
+
+        .categoria {
+            margin-top: 30px;
+        }
+
+        .categoria h2 {
+            border-bottom: 2px solid #ccc;
+            padding-bottom: 5px;
+        }
+
+        .cardapio-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            justify-content: center;
+        }
+
+        .card {
+            background-color: #fff;
+            border-radius: 10px;
+            padding: 15px;
+            width: 200px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .card h3 {
+            margin: 5px 0;
+        }
+
+        .card p {
+            margin: 5px 0;
+        }
+
+        .card button {
+            padding: 5px 10px;
+            margin: 3px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            color: white;
+        }
+
+        .add-btn {
+            background-color: #28a745;
+        }
+
+        .remove-btn {
+            background-color: #dc3545;
+        }
+
+        #pedido {
+            flex: 1;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            background-color: #fff;
+            border-left: 2px solid #ddd;
+            padding: 20px;
+            box-shadow: -2px 0 8px rgba(0,0,0,0.1);
+            overflow-y: auto;
+        }
+
+        #pedido h2 {
+            margin-top: 0;
+        }
+
+        #pedido ul {
+            list-style: none;
+            padding-left: 0;
+        }
+    </style>
+</head>
+<body>
+
+    <main>
+        <h1>Cardápio do Restaurante</h1>
+        <div id="categorias"></div>
+    </main>
+
+    <aside id="pedido">
+        <h2>Meu Pedido</h2>
+        <ul id="itens-pedido"></ul>
+        <p><strong>Total: R$ <span id="total">0.00</span></strong></p>
+    </aside>
+
+    <script>
+        // Carregar o cardápio do localStorage (ou usar padrão se vazio)
+        const cardapio = JSON.parse(localStorage.getItem("cardapio")) || [
+            { nome: "Cheeseburguer", preco: 20.00, categoria: "Hamburgueres" },
+            { nome: "Pizza Calabresa", preco: 35.00, categoria: "Pizzas" },
+            { nome: "Refrigerante", preco: 8.00, categoria: "Bebidas" },
+            { nome: "Sorvete", preco: 12.00, categoria: "Sobremesas" }
+        ];
+
+        const categoriasDiv = document.getElementById("categorias");
+        const itensPedido = document.getElementById("itens-pedido");
+        const totalSpan = document.getElementById("total");
+
+        let pedido = [];
+        let total = 0;
+
+        function adicionarAoPedido(item) {
+            pedido.push(item);
+            salvarPedido();
+            renderizarPedido();
+        }
+
+        function removerDoPedido(item) {
+            const index = pedido.findIndex(i => i.nome === item.nome);
+            if (index > -1) {
+                pedido.splice(index, 1);
+                salvarPedido();
+                renderizarPedido();
+            }
+        }
+
+        function salvarPedido() {
+            localStorage.setItem("pedidos", JSON.stringify(pedido));
+        }
+
+        function renderizarPedido() {
+            itensPedido.innerHTML = "";
+            total = 0;
+            pedido.forEach(i => {
+                const li = document.createElement("li");
+                li.textContent = `${i.nome} - R$ ${i.preco.toFixed(2)}`;
+                itensPedido.appendChild(li);
+                total += i.preco;
+            });
+            totalSpan.textContent = total.toFixed(2);
+        }
+
+        function renderizarCardapio() {
+            const categorias = ["Hamburgueres", "Pizzas", "Bebidas", "Sobremesas"];
+            categoriasDiv.innerHTML = "";
+
+            categorias.forEach(categoria => {
+                const divCategoria = document.createElement("div");
+                divCategoria.className = "categoria";
+                divCategoria.innerHTML = `<h2>${categoria}</h2>`;
+
+                const container = document.createElement("div");
+                container.className = "cardapio-container";
+
+                const itensCategoria = cardapio.filter(item => item.categoria === categoria);
+                if (itensCategoria.length === 0) {
+                    container.innerHTML = "<p>Nenhum item disponível nesta categoria.</p>";
+                } else {
+                    itensCategoria.forEach(item => {
+                        const card = document.createElement("div");
+                        card.className = "card";
+                        card.innerHTML = `
+                            <h3>${item.nome}</h3>
+                            <p>Preço: R$ ${item.preco.toFixed(2)}</p>
+                            <div>
+                                <button class="add-btn" onclick='adicionarAoPedido(${JSON.stringify(item)})'>Adicionar</button>
+                                <button class="remove-btn" onclick='removerDoPedido(${JSON.stringify(item)})'>Remover</button>
+                            </div>
+                        `;
+                        container.appendChild(card);
+                    });
+                }
+
+                divCategoria.appendChild(container);
+                categoriasDiv.appendChild(divCategoria);
+            });
+        }
+
+        renderizarCardapio();
+        renderizarPedido();
+    </script>
+
+</body>
+</html>

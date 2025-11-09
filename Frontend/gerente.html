@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Área do Gerente</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            background-color: #f5f5f5;
+        }
+        h1, h2 {
+            text-align: center;
+        }
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        input, select, button {
+            padding: 8px;
+            margin-right: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table, th, td {
+            border: 1px solid #ccc;
+        }
+        th, td {
+            padding: 8px;
+            text-align: center;
+        }
+        .remove-btn {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Área do Gerente</h1>
+    <div class="container">
+
+        <h2>Adicionar Item ao Cardápio</h2>
+        <div class="form-group">
+            <input type="text" id="nomeItem" placeholder="Nome do item">
+            <input type="number" id="precoItem" placeholder="Preço" step="0.01">
+            <select id="categoriaItem">
+                <option value="Hamburgueres">Hambúrgueres</option>
+                <option value="Pizzas">Pizzas</option>
+                <option value="Bebidas">Bebidas</option>
+                <option value="Sobremesas">Sobremesas</option>
+            </select>
+            <button onclick="adicionarItem()">Adicionar</button>
+        </div>
+
+        <h2>Cardápio Atual</h2>
+        <table id="tabelaCardapio">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Preço</th>
+                    <th>Categoria</th>
+                    <th>Ação</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+
+        <h2>Relatórios</h2>
+        <p>Total de pedidos: <span id="totalPedidos">0</span></p>
+        <p>Total faturado: R$ <span id="totalFaturado">0.00</span></p>
+
+    </div>
+
+    <script>
+        // Carregar cardápio e pedidos do localStorage
+        let cardapio = JSON.parse(localStorage.getItem("cardapio")) || [
+            { nome: "Cheeseburguer", preco: 20.00, categoria: "Hamburgueres" },
+            { nome: "Pizza Calabresa", preco: 35.00, categoria: "Pizzas" },
+            { nome: "Refrigerante", preco: 8.00, categoria: "Bebidas" },
+            { nome: "Sorvete", preco: 12.00, categoria: "Sobremesas" }
+        ];
+
+        let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+
+        const tabelaCardapio = document.querySelector("#tabelaCardapio tbody");
+        const totalPedidos = document.getElementById("totalPedidos");
+        const totalFaturado = document.getElementById("totalFaturado");
+
+        function salvarCardapio() {
+            localStorage.setItem("cardapio", JSON.stringify(cardapio));
+        }
+
+        function renderizarCardapio() {
+            tabelaCardapio.innerHTML = "";
+            cardapio.forEach((item, index) => {
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${item.nome}</td>
+                    <td>R$ ${item.preco.toFixed(2)}</td>
+                    <td>${item.categoria}</td>
+                    <td><button class="remove-btn" onclick="removerItem(${index})">Remover</button></td>
+                `;
+                tabelaCardapio.appendChild(tr);
+            });
+        }
+
+        function adicionarItem() {
+            const nome = document.getElementById("nomeItem").value;
+            const preco = parseFloat(document.getElementById("precoItem").value);
+            const categoria = document.getElementById("categoriaItem").value;
+
+            if(nome && !isNaN(preco) && categoria) {
+                cardapio.push({ nome, preco, categoria });
+                salvarCardapio();
+                renderizarCardapio();
+                document.getElementById("nomeItem").value = "";
+                document.getElementById("precoItem").value = "";
+            } else {
+                alert("Preencha todos os campos corretamente!");
+            }
+        }
+
+        function removerItem(index) {
+            cardapio.splice(index, 1);
+            salvarCardapio();
+            renderizarCardapio();
+        }
+
+        function atualizarRelatorio() {
+            let total = 0;
+            pedidos.forEach(pedido => {
+                pedido.forEach(item => total += item.preco);
+            });
+            totalPedidos.textContent = pedidos.length;
+            totalFaturado.textContent = total.toFixed(2);
+        }
+
+        renderizarCardapio();
+        atualizarRelatorio();
+    </script>
+
+</body>
+</html>
