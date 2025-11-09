@@ -28,3 +28,5 @@ VALUES
 (1, 'Suco Natural', 'Suco de frutas da estação', 8.50),
 (2, 'Strogonoff de Frango', 'Acompanha arroz e batata palha', 24.90),
 (3, 'Petit Gateau', 'Com sorvete de creme', 12.00);
+
+-- Teste de modificação - Iteração 2

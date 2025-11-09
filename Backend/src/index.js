@@ -62,3 +62,5 @@ app.get('/api/menu', (req,res) => {
 });
 
 app.listen(3000, () => console.log('Backend rodando em http://localhost:3000'));
+
+// Teste de modificação - Iteração 2
