@@ -15,17 +15,29 @@ Aplicação web para gerenciamento de cardápio e pedidos de restaurante.
 
 ## Estrutura do Projeto
 /Backend
+
 ├─ src/
+
 ├─ db.sqlite
+
 ├─ index.js
+
 └─ schema.sql
+
 /Frontend
+
 ├─ cadastro.html
+
 ├─ cardapio.html
+
 ├─ gerente.html
+
 └─ index.html
+
 /node_modules
+
 package-lock.json
+
 package.json
 
 ---
@@ -94,6 +106,6 @@ Dica: Alguns navegadores podem bloquear chamadas a localStorage ou fetch de arqu
 Em caso de dúvidas, contate a equipe de desenvolvimento:
 -	Dávila Ravena Silva Dorta.
 -	Johnny Kevin Teodoro Costa.
-Email: 10424743@mackenzista.com.br
+- Email: 10424743@mackenzista.com.br
 
 
