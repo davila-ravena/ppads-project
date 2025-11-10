@@ -34,9 +34,9 @@ package.json
 
 Antes de executar o projeto, certifique-se de ter instalado:
 
-- [Node.js](https://nodejs.org/) (versão 18 ou superior)
-- npm (gerenciador de pacotes do Node.js)
-- Git (opcional, para clonar o repositório)
+- [Node.js](https://nodejs.org/) (versão 18 ou superior).
+- npm (gerenciador de pacotes do Node.js).
+- Git (opcional, para clonar o repositório).
 
 ---
 
@@ -75,25 +75,25 @@ O servidor deve iniciar, geralmente em http://localhost:3000 (ou porta definida 
 
 ## Passo 5: Abrir o Frontend
 No navegador, abra os arquivos HTML diretamente:
-• Frontend/index.html → Tela de login
-• Frontend/cadastro.html → Cadastro de itens
-• Frontend/cardapio.html → Visualização do cardápio
-• Frontend/gerente.html → Área do gerente e relatórios
+- Frontend/index.html → Tela de login.
+- Frontend/cadastro.html → Cadastro de itens.
+- Frontend/cardapio.html → Visualização do cardápio.
+- Frontend/gerente.html → Área do gerente e relatórios.
 Dica: Alguns navegadores podem bloquear chamadas a localStorage ou fetch de arquivos locais; se necessário, use uma extensão para rodar arquivos HTML localmente ou um servidor local (ex.: Live Server do VS Code).
 
 ---
 
 ## Observações
-• Os pedidos finalizados são armazenados no localStorage do navegador.
-• Todas as alterações no cardápio são persistidas no localStorage ou no db.sqlite, dependendo da implementação do backend.
-• Para começar do zero, basta deletar o localStorage do navegador ou o arquivo db.sqlite.
+- Os pedidos finalizados são armazenados no localStorage do navegador.
+- Todas as alterações no cardápio são persistidas no localStorage ou no db.sqlite, dependendo da implementação do backend.
+- Para começar do zero, basta deletar o localStorage do navegador ou o arquivo db.sqlite.
 
 --- 
 
 ## Contato
 Em caso de dúvidas, contate a equipe de desenvolvimento:
-•	Dávila Ravena Silva Dorta
-•	Johnny Kevin Teodoro Costa
+-	Dávila Ravena Silva Dorta.
+-	Johnny Kevin Teodoro Costa.
 Email: 10424743@mackenzista.com.br
 
 
