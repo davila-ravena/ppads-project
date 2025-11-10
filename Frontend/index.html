@@ -62,13 +62,25 @@
 <body>
     <div class="login-container">
         <h1>Login</h1>
-        <input type="email" placeholder="Email" required>
-        <input type="password" placeholder="Senha" required>
-        <button>Entrar</button>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="password" id="senha" placeholder="Senha" required>
+        <button onclick="simularLogin()">Entrar</button>
         <div class="links">
             <a href="cadastro.html">Cadastre-se</a>
             <a href="#">Esqueceu a senha?</a>
         </div>
     </div>
+
+    <script>
+        function simularLogin() {
+            const email = document.getElementById('email').value;
+            // login simples para navegação simulada
+            if (email.includes('gerente')) {
+                window.location.href = 'gerente.html';
+            } else {
+                window.location.href = 'cardapio.html';
+            }
+        }
+    </script>
 </body>
 </html>

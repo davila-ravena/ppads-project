@@ -71,7 +71,7 @@
             background-color: #dc3545;
         }
 
-        #pedido {
+        aside#pedido {
             flex: 1;
             position: sticky;
             top: 0;
@@ -91,107 +91,176 @@
             list-style: none;
             padding-left: 0;
         }
+
+        #finalizar {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        #finalizar:hover {
+            background-color: #0056b3;
+        }
+
+        #voltar {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            width: 100%;
+            font-size: 16px;
+        }
+
+        #voltar:hover {
+            background-color: #5a6268;
+        }
     </style>
 </head>
 <body>
 
-    <main>
-        <h1>Cardápio do Restaurante</h1>
-        <div id="categorias"></div>
-    </main>
+<main>
+    <h1>Cardápio do Restaurante</h1>
+    <div id="categorias"></div>
+</main>
 
-    <aside id="pedido">
-        <h2>Meu Pedido</h2>
-        <ul id="itens-pedido"></ul>
-        <p><strong>Total: R$ <span id="total">0.00</span></strong></p>
-    </aside>
+<aside id="pedido">
+    <h2>Meu Pedido</h2>
+    <ul id="itens-pedido"></ul>
+    <p><strong>Total: R$ <span id="total">0.00</span></strong></p>
+    <button id="finalizar" onclick="finalizarPedido()">Finalizar Pedido</button>
+    <button id="voltar" onclick="window.location.href='index.html'">Voltar ao Login</button>
+</aside>
 
-    <script>
-        // Carregar o cardápio do localStorage (ou usar padrão se vazio)
-        const cardapio = JSON.parse(localStorage.getItem("cardapio")) || [
-            { nome: "Cheeseburguer", preco: 20.00, categoria: "Hamburgueres" },
-            { nome: "Pizza Calabresa", preco: 35.00, categoria: "Pizzas" },
-            { nome: "Refrigerante", preco: 8.00, categoria: "Bebidas" },
-            { nome: "Sorvete", preco: 12.00, categoria: "Sobremesas" }
-        ];
+<script>
+    // --- CARDÁPIO PADRÃO ---
+    const cardapio = JSON.parse(localStorage.getItem("cardapio")) || [
+        { nome: "Cheeseburguer", preco: 20.00, categoria: "Hamburgueres" },
+        { nome: "Pizza Calabresa", preco: 35.00, categoria: "Pizzas" },
+        { nome: "Refrigerante", preco: 8.00, categoria: "Bebidas" },
+        { nome: "Sorvete", preco: 12.00, categoria: "Sobremesas" }
+    ];
 
-        const categoriasDiv = document.getElementById("categorias");
-        const itensPedido = document.getElementById("itens-pedido");
-        const totalSpan = document.getElementById("total");
+    const categoriasDiv = document.getElementById("categorias");
+    const itensPedido = document.getElementById("itens-pedido");
+    const totalSpan = document.getElementById("total");
 
-        let pedido = [];
-        let total = 0;
+    let pedido = JSON.parse(localStorage.getItem("pedidoAtual")) || [];
+    let total = 0;
 
-        function adicionarAoPedido(item) {
-            pedido.push(item);
-            salvarPedido();
+    // --- ADICIONAR ITEM ---
+    function adicionarAoPedido(item) {
+        pedido.push(item);
+        salvarPedidoTemporario();
+        renderizarPedido();
+    }
+
+    // --- REMOVER ITEM ---
+    function removerDoPedido(item) {
+        const index = pedido.findIndex(i => i.nome === item.nome);
+        if (index > -1) {
+            pedido.splice(index, 1);
+            salvarPedidoTemporario();
             renderizarPedido();
         }
+    }
 
-        function removerDoPedido(item) {
-            const index = pedido.findIndex(i => i.nome === item.nome);
-            if (index > -1) {
-                pedido.splice(index, 1);
-                salvarPedido();
-                renderizarPedido();
-            }
+    // --- SALVAR PEDIDO TEMPORÁRIO ---
+    function salvarPedidoTemporario() {
+        localStorage.setItem("pedidoAtual", JSON.stringify(pedido));
+    }
+
+    // --- RENDERIZAR PEDIDO ---
+    function renderizarPedido() {
+        itensPedido.innerHTML = "";
+        total = 0;
+        pedido.forEach(i => {
+            const li = document.createElement("li");
+            li.textContent = `${i.nome} - R$ ${i.preco.toFixed(2)}`;
+            itensPedido.appendChild(li);
+            total += i.preco;
+        });
+        totalSpan.textContent = total.toFixed(2);
+    }
+
+    // --- FINALIZAR PEDIDO ---
+    function finalizarPedido() {
+        if (pedido.length === 0) {
+            alert("Seu pedido está vazio!");
+            return;
         }
 
-        function salvarPedido() {
-            localStorage.setItem("pedidos", JSON.stringify(pedido));
-        }
+        const data = new Date();
+        const dataFormatada = data.toLocaleDateString('pt-BR');
+        const horaFormatada = data.toLocaleTimeString('pt-BR');
 
-        function renderizarPedido() {
-            itensPedido.innerHTML = "";
-            total = 0;
-            pedido.forEach(i => {
-                const li = document.createElement("li");
-                li.textContent = `${i.nome} - R$ ${i.preco.toFixed(2)}`;
-                itensPedido.appendChild(li);
-                total += i.preco;
-            });
-            totalSpan.textContent = total.toFixed(2);
-        }
+        // Ajusta pedidos antigos no localStorage
+        const pedidosFinalizados = JSON.parse(localStorage.getItem("pedidosFinalizados")) || [];
 
-        function renderizarCardapio() {
-            const categorias = ["Hamburgueres", "Pizzas", "Bebidas", "Sobremesas"];
-            categoriasDiv.innerHTML = "";
+        pedidosFinalizados.push({
+            dataHora: `${dataFormatada} ${horaFormatada}`,  // PROPRIEDADE CORRETA
+            itens: [...pedido],
+            total: total
+        });
 
-            categorias.forEach(categoria => {
-                const divCategoria = document.createElement("div");
-                divCategoria.className = "categoria";
-                divCategoria.innerHTML = `<h2>${categoria}</h2>`;
+        localStorage.setItem("pedidosFinalizados", JSON.stringify(pedidosFinalizados));
 
-                const container = document.createElement("div");
-                container.className = "cardapio-container";
+        alert(`Pedido finalizado com sucesso!\nTotal: R$ ${total.toFixed(2)}`);
 
-                const itensCategoria = cardapio.filter(item => item.categoria === categoria);
-                if (itensCategoria.length === 0) {
-                    container.innerHTML = "<p>Nenhum item disponível nesta categoria.</p>";
-                } else {
-                    itensCategoria.forEach(item => {
-                        const card = document.createElement("div");
-                        card.className = "card";
-                        card.innerHTML = `
-                            <h3>${item.nome}</h3>
-                            <p>Preço: R$ ${item.preco.toFixed(2)}</p>
-                            <div>
-                                <button class="add-btn" onclick='adicionarAoPedido(${JSON.stringify(item)})'>Adicionar</button>
-                                <button class="remove-btn" onclick='removerDoPedido(${JSON.stringify(item)})'>Remover</button>
-                            </div>
-                        `;
-                        container.appendChild(card);
-                    });
-                }
-
-                divCategoria.appendChild(container);
-                categoriasDiv.appendChild(divCategoria);
-            });
-        }
-
-        renderizarCardapio();
+        // Limpa o pedido atual
+        pedido = [];
+        salvarPedidoTemporario();
         renderizarPedido();
-    </script>
+    }
+
+    // --- RENDERIZAR CARDÁPIO ---
+    function renderizarCardapio() {
+        const categorias = ["Hamburgueres", "Pizzas", "Bebidas", "Sobremesas"];
+        categoriasDiv.innerHTML = "";
+
+        categorias.forEach(categoria => {
+            const divCategoria = document.createElement("div");
+            divCategoria.className = "categoria";
+            divCategoria.innerHTML = `<h2>${categoria}</h2>`;
+
+            const container = document.createElement("div");
+            container.className = "cardapio-container";
+
+            const itensCategoria = cardapio.filter(item => item.categoria === categoria);
+            if (itensCategoria.length === 0) {
+                container.innerHTML = "<p>Nenhum item disponível nesta categoria.</p>";
+            } else {
+                itensCategoria.forEach(item => {
+                    const card = document.createElement("div");
+                    card.className = "card";
+                    card.innerHTML = `
+                        <h3>${item.nome}</h3>
+                        <p>Preço: R$ ${item.preco.toFixed(2)}</p>
+                        <div>
+                            <button class="add-btn" onclick='adicionarAoPedido(${JSON.stringify(item)})'>Adicionar</button>
+                            <button class="remove-btn" onclick='removerDoPedido(${JSON.stringify(item)})'>Remover</button>
+                        </div>
+                    `;
+                    container.appendChild(card);
+                });
+            }
+
+            divCategoria.appendChild(container);
+            categoriasDiv.appendChild(divCategoria);
+        });
+    }
+
+    renderizarCardapio();
+    renderizarPedido();
+</script>
 
 </body>
 </html>

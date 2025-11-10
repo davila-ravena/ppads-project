@@ -18,15 +18,17 @@
         }
         .form-group {
             margin-bottom: 15px;
+            text-align: center;
         }
         input, select, button {
             padding: 8px;
-            margin-right: 10px;
+            margin: 5px;
         }
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
+            background-color: white;
         }
         table, th, td {
             border: 1px solid #ccc;
@@ -41,6 +43,28 @@
             border: none;
             padding: 5px 10px;
             cursor: pointer;
+            border-radius: 5px;
+        }
+        .nav-btn {
+            display: block;
+            width: 200px;
+            margin: 20px auto;
+            text-align: center;
+            background-color: #007bff;
+            color: white;
+            padding: 10px;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .nav-btn:hover {
+            background-color: #0056b3;
+        }
+        .relatorio {
+            background-color: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
     </style>
 </head>
@@ -75,34 +99,55 @@
             <tbody></tbody>
         </table>
 
-        <h2>Relatórios</h2>
-        <p>Total de pedidos: <span id="totalPedidos">0</span></p>
-        <p>Total faturado: R$ <span id="totalFaturado">0.00</span></p>
+        <div class="relatorio">
+            <h2>Relatórios</h2>
+            <p><strong>Total de pedidos:</strong> <span id="totalPedidos">0</span></p>
+            <p><strong>Total faturado:</strong> R$ <span id="totalFaturado">0.00</span></p>
+
+            <h3>Detalhes dos pedidos</h3>
+            <table id="tabelaRelatorio">
+                <thead>
+                    <tr>
+                        <th>Data e Hora</th>
+                        <th>Itens</th>
+                        <th>Total (R$)</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+
+        <a href="cardapio.html" class="nav-btn">Ir para o Cardápio</a>
+        <a href="index.html" class="nav-btn">Voltar ao Login</a>
 
     </div>
 
     <script>
-        // Carregar cardápio e pedidos do localStorage
-        let cardapio = JSON.parse(localStorage.getItem("cardapio")) || [
+        // --- CARDÁPIO ---
+        let itens = JSON.parse(localStorage.getItem("cardapio")) || [
             { nome: "Cheeseburguer", preco: 20.00, categoria: "Hamburgueres" },
             { nome: "Pizza Calabresa", preco: 35.00, categoria: "Pizzas" },
             { nome: "Refrigerante", preco: 8.00, categoria: "Bebidas" },
             { nome: "Sorvete", preco: 12.00, categoria: "Sobremesas" }
         ];
 
-        let pedidos = JSON.parse(localStorage.getItem("pedidos")) || [];
+        // --- PEDIDOS FINALIZADOS ---
+        let pedidos = JSON.parse(localStorage.getItem("pedidosFinalizados")) || [];
 
         const tabelaCardapio = document.querySelector("#tabelaCardapio tbody");
+        const tabelaRelatorio = document.querySelector("#tabelaRelatorio tbody");
         const totalPedidos = document.getElementById("totalPedidos");
         const totalFaturado = document.getElementById("totalFaturado");
 
-        function salvarCardapio() {
-            localStorage.setItem("cardapio", JSON.stringify(cardapio));
+        // --- SALVAR ITENS ---
+        function salvarItens() {
+            localStorage.setItem("cardapio", JSON.stringify(itens));
         }
 
+        // --- RENDERIZAR CARDÁPIO ---
         function renderizarCardapio() {
             tabelaCardapio.innerHTML = "";
-            cardapio.forEach((item, index) => {
+            itens.forEach((item, index) => {
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
                     <td>${item.nome}</td>
@@ -120,8 +165,8 @@
             const categoria = document.getElementById("categoriaItem").value;
 
             if(nome && !isNaN(preco) && categoria) {
-                cardapio.push({ nome, preco, categoria });
-                salvarCardapio();
+                itens.push({ nome, preco, categoria });
+                salvarItens();
                 renderizarCardapio();
                 document.getElementById("nomeItem").value = "";
                 document.getElementById("precoItem").value = "";
@@ -131,16 +176,33 @@
         }
 
         function removerItem(index) {
-            cardapio.splice(index, 1);
-            salvarCardapio();
+            itens.splice(index, 1);
+            salvarItens();
             renderizarCardapio();
         }
 
+        // --- RELATÓRIO DE PEDIDOS ---
         function atualizarRelatorio() {
+            tabelaRelatorio.innerHTML = "";
             let total = 0;
+
             pedidos.forEach(pedido => {
-                pedido.forEach(item => total += item.preco);
+                const totalPedido = pedido.total || pedido.itens.reduce((soma, item) => soma + item.preco, 0);
+                const nomesItens = pedido.itens.map(i => i.nome).join(", ");
+
+                // Corrige o nome da propriedade da data
+                const dataHora = pedido.dataHora || pedido.data || "Data não informada";
+
+                const tr = document.createElement("tr");
+                tr.innerHTML = `
+                    <td>${dataHora}</td>
+                    <td>${nomesItens}</td>
+                    <td>${totalPedido.toFixed(2)}</td>
+                `;
+                tabelaRelatorio.appendChild(tr);
+                total += totalPedido;
             });
+
             totalPedidos.textContent = pedidos.length;
             totalFaturado.textContent = total.toFixed(2);
         }
