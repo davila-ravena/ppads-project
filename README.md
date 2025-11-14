@@ -95,17 +95,33 @@ Dica: Alguns navegadores podem bloquear chamadas a localStorage ou fetch de arqu
 
 ---
 
-## Observações
-- Os pedidos finalizados são armazenados no localStorage do navegador.
-- Todas as alterações no cardápio são persistidas no localStorage ou no db.sqlite, dependendo da implementação do backend.
-- Para começar do zero, basta deletar o localStorage do navegador ou o arquivo db.sqlite.
+## 6. Usuários de Demonstração (Ambiente de Teste)
+A aplicação simula autenticação de usuários para fins de testes.
 
---- 
+👨‍🍳 Cliente
+
+Email: cliente@teste.com
+
+Senha: 1234
+
+🧑‍🏫 Gerente
+
+Email: gerente@teste.com
+
+Senha: 1234
+
+💡 Cenários de erro
+
+Email válido + senha incorreta → exibe "Senha incorreta"
+
+Email não cadastrado → exibe "Usuário não encontrado"
+
+Campos vazios → exibe "Preencha todos os campos"
+
+---
 
 ## Contato
 Em caso de dúvidas, contate a equipe de desenvolvimento:
 -	Dávila Ravena Silva Dorta.
 -	Johnny Kevin Teodoro Costa.
 - Email: 10424743@mackenzista.com.br
-
-
