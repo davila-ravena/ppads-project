@@ -24,19 +24,29 @@
             padding: 8px;
             margin: 5px;
         }
+
+        /* --------------------------
+           TABELAS ALINHADAS
+        --------------------------- */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
             background-color: white;
+            table-layout: fixed;     /* ALINHA TODAS AS COLUNAS */
+            overflow-x: auto;        /* Responsivo sem quebrar layout */
         }
-        table, th, td {
+        table th, table td {
             border: 1px solid #ccc;
-        }
-        th, td {
-            padding: 8px;
+            padding: 10px;
             text-align: center;
+            word-wrap: break-word;
         }
+        table thead th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+        }
+
         .remove-btn {
             background-color: #dc3545;
             color: white;
@@ -45,6 +55,7 @@
             cursor: pointer;
             border-radius: 5px;
         }
+
         .nav-btn {
             display: block;
             width: 200px;
@@ -101,6 +112,21 @@
 
         <div class="relatorio">
             <h2>Relatórios</h2>
+
+            <div class="form-group">
+                <label>Filtrar por data: </label>
+                <input type="date" id="filtroData" onchange="atualizarRelatorio()">
+
+                <label>Filtrar por categoria: </label>
+                <select id="filtroCategoria" onchange="atualizarRelatorio()">
+                    <option value="">Todas</option>
+                    <option value="Hamburgueres">Hambúrgueres</option>
+                    <option value="Pizzas">Pizzas</option>
+                    <option value="Bebidas">Bebidas</option>
+                    <option value="Sobremesas">Sobremesas</option>
+                </select>
+            </div>
+
             <p><strong>Total de pedidos:</strong> <span id="totalPedidos">0</span></p>
             <p><strong>Total faturado:</strong> R$ <span id="totalFaturado">0.00</span></p>
 
@@ -123,7 +149,11 @@
     </div>
 
     <script>
-        // --- CARDÁPIO ---
+
+        /* -----------------------------
+           DADOS DO CARDÁPIO E PEDIDOS
+        ------------------------------ */
+
         let itens = JSON.parse(localStorage.getItem("cardapio")) || [
             { nome: "Cheeseburguer", preco: 20.00, categoria: "Hamburgueres" },
             { nome: "Pizza Calabresa", preco: 35.00, categoria: "Pizzas" },
@@ -131,7 +161,6 @@
             { nome: "Sorvete", preco: 12.00, categoria: "Sobremesas" }
         ];
 
-        // --- PEDIDOS FINALIZADOS ---
         let pedidos = JSON.parse(localStorage.getItem("pedidosFinalizados")) || [];
 
         const tabelaCardapio = document.querySelector("#tabelaCardapio tbody");
@@ -139,12 +168,10 @@
         const totalPedidos = document.getElementById("totalPedidos");
         const totalFaturado = document.getElementById("totalFaturado");
 
-        // --- SALVAR ITENS ---
         function salvarItens() {
             localStorage.setItem("cardapio", JSON.stringify(itens));
         }
 
-        // --- RENDERIZAR CARDÁPIO ---
         function renderizarCardapio() {
             tabelaCardapio.innerHTML = "";
             itens.forEach((item, index) => {
@@ -160,19 +187,22 @@
         }
 
         function adicionarItem() {
-            const nome = document.getElementById("nomeItem").value;
+            const nome = document.getElementById("nomeItem").value.trim();
             const preco = parseFloat(document.getElementById("precoItem").value);
             const categoria = document.getElementById("categoriaItem").value;
 
-            if(nome && !isNaN(preco) && categoria) {
-                itens.push({ nome, preco, categoria });
-                salvarItens();
-                renderizarCardapio();
-                document.getElementById("nomeItem").value = "";
-                document.getElementById("precoItem").value = "";
-            } else {
-                alert("Preencha todos os campos corretamente!");
+            if (!nome || isNaN(preco) || preco <= 0) {
+                alert("Preencha um nome válido e um preço maior que zero!");
+                return;
             }
+
+            itens.push({ nome, preco, categoria });
+            salvarItens();
+            renderizarCardapio();
+
+            document.getElementById("nomeItem").value = "";
+            document.getElementById("precoItem").value = "";
+            document.getElementById("categoriaItem").value = "Hamburgueres";
         }
 
         function removerItem(index) {
@@ -181,17 +211,31 @@
             renderizarCardapio();
         }
 
-        // --- RELATÓRIO DE PEDIDOS ---
         function atualizarRelatorio() {
+            const filtroData = document.getElementById("filtroData").value;
+            const filtroCategoria = document.getElementById("filtroCategoria").value;
+
             tabelaRelatorio.innerHTML = "";
             let total = 0;
+            let totalPedidosFiltrados = 0;
 
             pedidos.forEach(pedido => {
-                const totalPedido = pedido.total || pedido.itens.reduce((soma, item) => soma + item.preco, 0);
-                const nomesItens = pedido.itens.map(i => i.nome).join(", ");
 
-                // Corrige o nome da propriedade da data
-                const dataHora = pedido.dataHora || pedido.data || "Data não informada";
+                const dataHora = pedido.dataHora || pedido.data || "";
+                const dataSomente = dataHora.split(" ")[0];
+
+                const [dia, mes, ano] = dataSomente.split("/");
+                const dataFormatada = `${ano}-${mes}-${dia}`;
+
+                if (filtroData && dataFormatada !== filtroData) return;
+
+                if (filtroCategoria) {
+                    const temCategoria = pedido.itens.some(item => item.categoria === filtroCategoria);
+                    if (!temCategoria) return;
+                }
+
+                const totalPedido = pedido.total || pedido.itens.reduce((s, item) => s + item.preco, 0);
+                const nomesItens = pedido.itens.map(i => i.nome).join(", ");
 
                 const tr = document.createElement("tr");
                 tr.innerHTML = `
@@ -199,16 +243,20 @@
                     <td>${nomesItens}</td>
                     <td>${totalPedido.toFixed(2)}</td>
                 `;
+
                 tabelaRelatorio.appendChild(tr);
+
                 total += totalPedido;
+                totalPedidosFiltrados++;
             });
 
-            totalPedidos.textContent = pedidos.length;
+            totalPedidos.textContent = totalPedidosFiltrados;
             totalFaturado.textContent = total.toFixed(2);
         }
 
         renderizarCardapio();
         atualizarRelatorio();
+
     </script>
 
 </body>

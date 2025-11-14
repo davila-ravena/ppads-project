@@ -27,6 +27,8 @@
             width: 100%;
             border-radius: 5px;
             border: 1px solid #ccc;
+            text-align: left;
+            box-sizing: border-box;
         }
         button {
             padding: 10px 20px;
@@ -50,18 +52,77 @@
         a:hover {
             text-decoration: underline;
         }
+        #mensagem {
+            margin-top: 10px;
+            font-size: 14px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <form>
+    <form onsubmit="validarCadastro(event)">
         <h2>Cadastro de Usuário</h2>
-        <input type="text" placeholder="Nome" required>
-        <input type="email" placeholder="Email" required>
-        <input type="tel" placeholder="Telefone" required>
-        <input type="password" placeholder="Senha" required>
-        <input type="password" placeholder="Confirme a senha" required>
+
+        <input type="text" id="nome" placeholder="Nome" required>
+        <input type="email" id="email" placeholder="Email" required>
+        <input type="tel" id="telefone" placeholder="Telefone" required>
+        <input type="password" id="senha" placeholder="Senha" required>
+        <input type="password" id="confirmar" placeholder="Confirme a senha" required>
+
         <button type="submit">Cadastrar</button>
+
+        <p id="mensagem"></p>
+
         <a href="index.html">Voltar ao login</a>
     </form>
+
+    <script>
+
+        // Simulando base de emails já cadastrados (mesmos do login)
+        const emailsExistentes = [
+            "cliente@teste.com",
+            "gerente@teste.com"
+        ];
+
+        function validarCadastro(event) {
+            event.preventDefault();
+
+            const nome = document.getElementById("nome").value.trim();
+            const email = document.getElementById("email").value.trim();
+            const telefone = document.getElementById("telefone").value.trim();
+            const senha = document.getElementById("senha").value.trim();
+            const confirmar = document.getElementById("confirmar").value.trim();
+            const msg = document.getElementById("mensagem");
+
+            msg.textContent = "";
+            msg.style.display = "block";
+
+            // 1) Campo obrigatório vazio
+            if (!nome || !email || !telefone || !senha || !confirmar) {
+                msg.style.color = "red";
+                msg.textContent = "Preencha todos os campos!";
+                return;
+            }
+
+            // 2) Email já cadastrado
+            if (emailsExistentes.includes(email)) {
+                msg.style.color = "red";
+                msg.textContent = "Email já cadastrado.";
+                return;
+            }
+
+            // 3) Senhas diferentes
+            if (senha !== confirmar) {
+                msg.style.color = "red";
+                msg.textContent = "As senhas não coincidem!";
+                return;
+            }
+
+            // 4) Cadastro válido
+            msg.style.color = "green";
+            msg.textContent = "Cadastro finalizado com sucesso!";
+        }
+
+    </script>
 </body>
 </html>
