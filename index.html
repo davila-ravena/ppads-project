@@ -21,8 +21,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
             width: 300px;
             text-align: center;
-
-            /* Mantém alinhamento */
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -80,7 +78,6 @@
             text-decoration: underline;
         }
 
-        /* Mensagens de erro */
         #error-message {
             color: #d10000;
             font-size: 0.9em;
@@ -95,6 +92,8 @@
         <h1>Login</h1>
 
         <input type="email" id="email" placeholder="Email" required>
+
+        <!-- Campo de senha permanece igual -->
         <input type="password" id="senha" placeholder="Senha" required>
 
         <button onclick="simularLogin()">Entrar</button>
@@ -108,6 +107,16 @@
     </div>
 
     <script>
+        // ==========================
+        // Função de Mostrar/Ocultar Senha
+        // ==========================
+        const campoSenha = document.getElementById("senha");
+
+        campoSenha.addEventListener("dblclick", function () {
+            campoSenha.type = campoSenha.type === "password" ? "text" : "password";
+        });
+        // (duplo clique → troca entre ocultar/mostrar sem alterar o layout)
+
         // Base de usuários cadastrados para teste
         const usuarios = [
             { email: "cliente@teste.com", senha: "1234", tipo: "cliente" },
@@ -122,14 +131,12 @@
             error.style.display = "none";
             error.textContent = "";
 
-            // 1) Campos vazios
             if (email === "" || senha === "") {
                 error.textContent = "Preencha todos os campos.";
                 error.style.display = "block";
                 return;
             }
 
-            // 2) Procura usuário no banco
             const usuario = usuarios.find(u => u.email === email);
 
             if (!usuario) {
@@ -138,14 +145,12 @@
                 return;
             }
 
-            // 3) Senha incorreta
             if (usuario.senha !== senha) {
                 error.textContent = "Senha incorreta.";
                 error.style.display = "block";
                 return;
             }
 
-            // 4) Login correto → Redirecionamentos
             if (usuario.tipo === "gerente") {
                 window.location.href = "gerente.html";
                 return;
