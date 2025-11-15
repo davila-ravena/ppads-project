@@ -25,16 +25,13 @@
             margin: 5px;
         }
 
-        /* --------------------------
-           TABELAS ALINHADAS
-        --------------------------- */
         table {
             width: 100%;
             border-collapse: collapse;
             margin-top: 20px;
             background-color: white;
-            table-layout: fixed;     /* ALINHA TODAS AS COLUNAS */
-            overflow-x: auto;        /* Responsivo sem quebrar layout */
+            table-layout: fixed;
+            overflow-x: auto;
         }
         table th, table td {
             border: 1px solid #ccc;
@@ -54,6 +51,20 @@
             padding: 5px 10px;
             cursor: pointer;
             border-radius: 5px;
+        }
+
+        /* NOVO - Botão Editar */
+        .edit-btn {
+            background-color: #ffc107;
+            color: black;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-right: 5px;
+        }
+        .edit-btn:hover {
+            background-color: #e0a800;
         }
 
         .nav-btn {
@@ -150,10 +161,7 @@
 
     <script>
 
-        /* -----------------------------
-           DADOS DO CARDÁPIO E PEDIDOS
-        ------------------------------ */
-
+        /* DADOS DO CARDÁPIO */
         let itens = JSON.parse(localStorage.getItem("cardapio")) || [
             { nome: "Cheeseburguer", preco: 20.00, categoria: "Hamburgueres" },
             { nome: "Pizza Calabresa", preco: 35.00, categoria: "Pizzas" },
@@ -180,7 +188,10 @@
                     <td>${item.nome}</td>
                     <td>R$ ${item.preco.toFixed(2)}</td>
                     <td>${item.categoria}</td>
-                    <td><button class="remove-btn" onclick="removerItem(${index})">Remover</button></td>
+                    <td>
+                        <button class="edit-btn" onclick="editarPreco(${index})">Editar</button>
+                        <button class="remove-btn" onclick="removerItem(${index})">Remover</button>
+                    </td>
                 `;
                 tabelaCardapio.appendChild(tr);
             });
@@ -209,6 +220,28 @@
             itens.splice(index, 1);
             salvarItens();
             renderizarCardapio();
+        }
+
+        /* FUNÇÃO NOVA — EDITAR PREÇO */
+        function editarPreco(index) {
+            const item = itens[index];
+            const novoPreco = prompt(
+                `Editar preço de "${item.nome}".\nPreço atual: R$ ${item.preco.toFixed(2)}\n\nDigite o novo preço:`
+            );
+
+            if (novoPreco === null) return;
+
+            const precoNum = parseFloat(novoPreco);
+
+            if (isNaN(precoNum) || precoNum <= 0) {
+                alert("Digite um valor válido!");
+                return;
+            }
+
+            itens[index].preco = precoNum;
+            salvarItens();
+            renderizarCardapio();
+            alert("Preço atualizado!");
         }
 
         function atualizarRelatorio() {
